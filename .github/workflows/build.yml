@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - uses: actions/checkout@v3
+      
       - uses: sparkfabrik/android-build-action@v1.3.4
         with:
           project-path: .
