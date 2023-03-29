@@ -6,4 +6,5 @@ When you launch the application, it will open the login page where you can enter
 
 ## Notes
 - This application is currently under development. There may be bugs, and it might not function correctly. I'm not an Android developer, I just looked for some sample code and somehow I managed to put together something that seems to work.
+- The Android installer may attempt to prevent you from installing the application since it comes from an unknown developer... But there's a tiny option that will allow you to install it anyway.
 - The application will not appear in the launcher on Android TV. However, you can locate it by navigating to Settings, Applications.
