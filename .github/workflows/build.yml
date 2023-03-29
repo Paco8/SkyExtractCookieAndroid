@@ -1,0 +1,14 @@
+name: Build apk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: sparkfabrik/android-build-action@v1.3.4
+        with:
+          project-path: .
+          output-path: my-app.apk
