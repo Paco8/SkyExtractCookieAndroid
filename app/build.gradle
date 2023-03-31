@@ -20,6 +20,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        applicationVariants.all {
+                // this method is use to rename your all apk whether
+                // it may be signed or unsigned(debug apk)
+            variant ->
+                variant.outputs.each {
+                    output ->
+                        def name = "SkyExtractCookie.apk"
+                        output.outputFileName = name
+                }
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
