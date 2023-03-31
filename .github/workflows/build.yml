@@ -8,9 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - run: chmod 755 ./gradlew
       
-      - uses: sparkfabrik/android-build-action@v1.3.4
+      - name: Build
+        uses: sparkfabrik/android-build-action@v1.3.4
         with:
           project-path: .
           output-path: my-app.apk
