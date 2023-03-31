@@ -17,4 +17,10 @@ jobs:
         uses: sparkfabrik/android-build-action@v1.3.4
         with:
           project-path: .
-          output-path: my-app.apk
+          output-path: SkyExtractCookie.apk
+
+      - name: Create artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: SkyExtractCookie
+          path: SkyExtractCookie.apk
