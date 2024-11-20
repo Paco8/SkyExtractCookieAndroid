@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
+        settings.setUserAgentString("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36");
         CookieManager.getInstance().removeAllCookies(null);
         CookieManager.getInstance().setAcceptCookie(true);
         mWebView.setWebViewClient(new MyWebViewClient());
@@ -116,8 +116,10 @@ public class MainActivity extends Activity {
                             "}\n", url, BuildConfig.VERSION_NAME, host, cookies, timestamp.getTime());
 
                     File downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    //File downloadsDirectory = new File("/data/local/tmp/");
                     File file = new File(downloadsDirectory, output_file);
+                    if (file.exists()) {
+                        file.delete();
+                    }
 
                     try {
                         FileOutputStream fos = new FileOutputStream(file, false);
