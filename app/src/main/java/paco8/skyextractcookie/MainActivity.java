@@ -27,7 +27,7 @@ import java.util.Date;
 public class MainActivity extends Activity {
 
     private WebView mWebView;
-    private String host, platform, output_file;
+    private String host, platform, output_file, login_url, wait_for;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         if (platform != null) {
             loadPage();
         } else {
-            CharSequence[] items = {"PeacockTV", "SkyShowtime"};
+            CharSequence[] items = {"PeacockTV", "SkyShowtime", "NowTV", "WowTV"};
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select your streaming service:")
                     .setItems(items, new DialogInterface.OnClickListener() {
@@ -52,9 +52,27 @@ public class MainActivity extends Activity {
                             switch (item) {
                                 case 0:
                                     platform = "peacocktv";
+                                    host = "https://www.peacocktv.com";
+                                    login_url = host + "/signin";
+                                    wait_for = "localisation";
                                     break;
                                 case 1:
                                     platform = "skyshowtime";
+                                    host = "https://www.skyshowtime.com";
+                                    login_url = host + "/signin";
+                                    wait_for = "localisation";
+                                    break;
+                                case 2:
+                                    platform = "nowtv";
+                                    host = "https://www.nowtv.com";
+                                    login_url = host + "/gb/sign-in";
+                                    wait_for = "home";
+                                    break;
+                                case 3:
+                                    platform = "wowtv";
+                                    host = "https://www.wowtv.de";
+                                    login_url = host + "/login";
+                                    wait_for = "home";
                                     break;
                             }
                             loadPage();
@@ -79,8 +97,7 @@ public class MainActivity extends Activity {
         CookieManager.getInstance().setAcceptCookie(true);
         mWebView.setWebViewClient(new MyWebViewClient());
 
-        host = "https://www." + platform + ".com";
-        mWebView.loadUrl(host + "/signin");
+        mWebView.loadUrl(login_url);
     }
 
     private class MyWebViewClient extends WebViewClient {
@@ -92,7 +109,7 @@ public class MainActivity extends Activity {
 
             String url = request.getUrl().toString();
             Log.d("url", url);
-            if (url.contains("localisation")) {
+            if (url.contains(wait_for)) {
                 //Map<String, String> headers = request.getRequestHeaders();
                 //Log.d("Headers sent", url + " " + headers.toString());
 
