@@ -5,8 +5,13 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
@@ -17,6 +22,7 @@ import android.webkit.WebViewClient;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.OutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -88,6 +94,9 @@ public class MainActivity extends Activity {
         System.out.println("platform: " + platform);
         System.out.println("output_file: " + output_file);
 
+        //String json = "Test";
+        //saveToFile(json);
+
         mWebView = (WebView) findViewById(R.id.webview);
         WebSettings settings = mWebView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -132,24 +141,48 @@ public class MainActivity extends Activity {
                             "  \"timestamp\": \"%d\"\n" +
                             "}\n", url, BuildConfig.VERSION_NAME, host, cookies, timestamp.getTime());
 
-                    File downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    File file = new File(downloadsDirectory, output_file);
-                    if (file.exists()) {
-                        file.delete();
-                    }
-
-                    try {
-                        FileOutputStream fos = new FileOutputStream(file, false);
-                        fos.write(json.getBytes());
-                        fos.close();
-                        showResult("Access token saved as "+ file.getAbsolutePath());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        showResult("Error: " + e.getMessage());
-                    }
+                    saveToFile(json);
                 }
             }
             return super.shouldInterceptRequest(view, request);
+        }
+    }
+
+    private void saveToFile(String json) {
+        try {
+            OutputStream out;
+            String filePath;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) { // Android 10+
+                ContentResolver resolver = getContentResolver();
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Downloads.DISPLAY_NAME, output_file);
+                values.put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream");
+                values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+                Uri fileUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+                if (fileUri == null) {
+                    showResult("Error: Unable to create file.");
+                    return;
+                }
+                out = resolver.openOutputStream(fileUri, "wt"); // Overwrite mode
+                filePath = "Downloads/" + output_file;
+            } else { // Android 9 and below
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), output_file);
+                if (file.exists()) file.delete();
+                out = new FileOutputStream(file, false); // Overwrite mode
+                filePath = file.getAbsolutePath();
+            }
+
+            if (out != null) {
+                out.write(json.getBytes());
+                out.close();
+                showResult("Access token saved as " + filePath);
+            } else {
+                showResult("Error: Output stream is null.");
+            }
+        } catch (IOException e) {
+            showResult("Error: " + e.getMessage());
         }
     }
 
