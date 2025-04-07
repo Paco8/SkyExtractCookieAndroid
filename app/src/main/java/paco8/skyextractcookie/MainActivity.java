@@ -33,7 +33,7 @@ import java.util.Date;
 public class MainActivity extends Activity {
 
     private WebView mWebView;
-    private String host, platform, output_file, login_url, wait_for;
+    private String host, platform, output_file, login_url, target_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
         if (platform != null) {
             loadPage();
         } else {
-            CharSequence[] items = {"PeacockTV", "SkyShowtime", "NowTV", "WowTV"};
+            CharSequence[] items = {"PeacockTV", "SkyShowtime", "NowTV (UK)", "WowTV (DE)", "Sky (CH)"};
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Select your streaming service:")
                     .setItems(items, new DialogInterface.OnClickListener() {
@@ -60,25 +60,31 @@ public class MainActivity extends Activity {
                                     platform = "peacocktv";
                                     host = "https://www.peacocktv.com";
                                     login_url = host + "/signin";
-                                    wait_for = "localisation";
+                                    target_url = "localisation";
                                     break;
                                 case 1:
                                     platform = "skyshowtime";
                                     host = "https://www.skyshowtime.com";
                                     login_url = host + "/signin";
-                                    wait_for = "localisation";
+                                    target_url = "localisation";
                                     break;
                                 case 2:
                                     platform = "nowtv";
                                     host = "https://www.nowtv.com";
                                     login_url = host + "/gb/sign-in";
-                                    wait_for = "home";
+                                    target_url = "home";
                                     break;
                                 case 3:
                                     platform = "wowtv";
                                     host = "https://www.wowtv.de";
                                     login_url = host + "/login";
-                                    wait_for = "home";
+                                    target_url = "home";
+                                    break;
+                                case 4:
+                                    platform = "sky";
+                                    host = "https://user.sky.ch";
+                                    login_url = host + "/de/authentication/login?redirect=https://app.sky.ch/de/show";
+                                    target_url = "mobile";
                                     break;
                             }
                             loadPage();
@@ -118,7 +124,7 @@ public class MainActivity extends Activity {
 
             String url = request.getUrl().toString();
             Log.d("url", url);
-            if (url.contains(wait_for)) {
+            if (url.contains(target_url)) {
                 //Map<String, String> headers = request.getRequestHeaders();
                 //Log.d("Headers sent", url + " " + headers.toString());
 
@@ -130,6 +136,7 @@ public class MainActivity extends Activity {
                     Date now = Calendar.getInstance().getTime();
                     Timestamp timestamp = new Timestamp(now.getTime());
 
+                    cookies = cookies.replace("\"", "\\\"");
                     String json = String.format(
                             "{\n" +
                             "  \"url\": \"%s\",\n" +
